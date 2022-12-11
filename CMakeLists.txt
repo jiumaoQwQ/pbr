@@ -10,4 +10,4 @@ add_executable(main main.cpp shader.h stb_image.h camera.h sphere.h)
 
 add_subdirectory(external)
 
-target_link_libraries(main glad glfw glm::glm)
+target_link_libraries(main glad glfw glm::glm imgui)
