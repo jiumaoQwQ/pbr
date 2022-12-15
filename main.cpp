@@ -1,6 +1,4 @@
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
+#include <imgui_wrapper.h>
 
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
@@ -38,14 +36,7 @@ int main()
 
     gladLoadGL(glfwGetProcAddress);
 
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
-
-    const char* glsl_version = "#version 330";
-    ImGui::StyleColorsDark();
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init(glsl_version);
+    ImGuiWrapper guiwrapper(window);
 
     bool showDemoWindow = true;
 
@@ -53,26 +44,18 @@ int main()
     {
         processInput(window);
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
+        guiwrapper.frame();
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         ImGui::ShowDemoWindow(&showDemoWindow);
 
-        ImGui::Render();
-
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        guiwrapper.render();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
 
     glfwTerminate();
     return 0;
