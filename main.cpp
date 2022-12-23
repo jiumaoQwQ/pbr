@@ -126,6 +126,16 @@ int main()
     unsigned int roughness = loadTexture("../../data/roughness.png");
     unsigned int ao = loadTexture("../../data/ao.png");
 
+    glm::vec3 lightPositions = {
+        glm::vec3(0.0f, 0.0f, 10.0f),
+    };
+    glm::vec3 lightColors = {
+        glm::vec3(150.0f, 150.0f, 150.0f),
+    };
+
+    shader.setVec3("lightPositions[0]",lightPositions);
+    shader.setVec3("lightColors[0]",lightColors);
+
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);

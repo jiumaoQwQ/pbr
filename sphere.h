@@ -97,10 +97,10 @@ public:
             glEnableVertexAttribArray(2);
             glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void *)(6 * sizeof(float)));
         }
-            glBindVertexArray(sphereVAO);
-            glDrawElements(GL_TRIANGLE_STRIP, indexCount, GL_UNSIGNED_INT, 0);
-        
+        glBindVertexArray(sphereVAO);
+        glDrawElements(GL_TRIANGLE_STRIP, indexCount, GL_UNSIGNED_INT, 0);
     }
+
 
 private:
     glm::vec3 pos;
