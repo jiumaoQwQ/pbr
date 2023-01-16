@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-#include "camera.h"
+#include "Camera.h"
 #include "shader.h"
 #include "sphere.h"
 
@@ -22,17 +22,26 @@ bool firstMouse = true;
 int lastX, lastY;
 void processInput(GLFWwindow *window)
 {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, deltaTime);
+    {
+        camera.pos += camera.front * deltaTime;
+    }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, deltaTime);
+    {
+        camera.pos -= camera.front * deltaTime;
+    }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);
+    {
+        camera.pos += camera.right * deltaTime;
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    {
+        camera.pos -= camera.right * deltaTime;
+    }
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    {
+        glfwSetWindowShouldClose(window,true);
+    }
 }
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn)
 {
@@ -46,13 +55,13 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn)
         firstMouse = false;
     }
 
-    float xoffset = xpos - lastX;
+    float xoffset = lastX - xpos;
     float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
 
     lastX = xpos;
     lastY = ypos;
 
-    camera.ProcessMouseMovement(xoffset, yoffset);
+    camera.onMouseMove(xoffset, yoffset);
 }
 unsigned int loadTexture(char const *path)
 {
@@ -110,6 +119,7 @@ int main()
     gladLoadGL(glfwGetProcAddress);
 
     glEnable(GL_DEPTH_TEST);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     Shader shader;
     shader.init("../../data/shader.vs", "../../data/shader.fs");
@@ -133,13 +143,12 @@ int main()
         glm::vec3(150.0f, 150.0f, 150.0f),
     };
 
-    shader.setVec3("lightPositions[0]",lightPositions);
-    shader.setVec3("lightColors[0]",lightColors);
+    shader.setVec3("lightPositions[0]", lightPositions);
+    shader.setVec3("lightColors[0]", lightColors);
 
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
-
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -149,12 +158,11 @@ int main()
 
         shader.use();
 
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), 1920.0f / 1080.0f, 0.1f, 100.0f);
-        shader.setMat4("projection", projection);
+        shader.setMat4("projection", camera.getProjectionMatrix());
 
-        glm::mat4 view = camera.GetViewMatrix();
+        glm::mat4 view = camera.getViewMatrix();
         shader.setMat4("view", view);
-        shader.setVec3("camPos", camera.Position);
+        shader.setVec3("camPos", camera.pos);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, albedo);
@@ -175,12 +183,11 @@ int main()
         {
             for (int col = 0; col < nrColumns; ++col)
             {
-                model = glm::mat4(1.0f);
-                model = glm::translate(model, glm::vec3(
-                                                  (float)(col - (nrColumns / 2)) * spacing,
-                                                  (float)(row - (nrRows / 2)) * spacing,
-                                                  0.0f));
-                shader.setMat4("model", model);
+                sphere.setPos({(float)(col - (nrColumns / 2)) * spacing,
+                               (float)(row - (nrRows / 2)) * spacing,
+                               0.0f});
+
+                shader.setMat4("model", sphere.getModelMatrix());
                 sphere.draw();
             }
         }

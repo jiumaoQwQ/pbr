@@ -101,6 +101,15 @@ public:
         glDrawElements(GL_TRIANGLE_STRIP, indexCount, GL_UNSIGNED_INT, 0);
     }
 
+    glm::mat4 getModelMatrix()
+    {
+        return glm::translate(glm::mat4(1.0f), pos);
+    }
+
+    void setPos(glm::vec3 const &_pos)
+    {
+        pos = _pos;
+    }
 
 private:
     glm::vec3 pos;
