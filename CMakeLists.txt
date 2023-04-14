@@ -1,13 +1,21 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(pbr LANGUAGES CXX)
+project(pbr)
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
-
-add_executable(main main.cpp stb_image.h Camera.h sphere.h shader.h)
+add_executable(main main.cpp)
 
 add_subdirectory(external)
 
-target_link_libraries(main glad glfw glm::glm imgui)
+target_link_libraries(main glad glfw glm::glm)
+
+add_custom_command(
+        TARGET main POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+                ${CMAKE_SOURCE_DIR}/shader
+                ${CMAKE_CURRENT_BINARY_DIR}/Debug/shader)
+
+add_custom_command(
+        TARGET main POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+                ${CMAKE_SOURCE_DIR}/shader
+                ${CMAKE_CURRENT_BINARY_DIR}/Release/shader)

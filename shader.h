@@ -2,6 +2,7 @@
 
 #include <glad/gl.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <string>
 #include <fstream>
@@ -13,9 +14,7 @@ class Shader
 public:
     unsigned int ID;
 
-    Shader() = default;
-
-    void init(const char *vertexPath, const char *fragmentPath)
+    explicit Shader(const char *vertexPath, const char *fragmentPath)
     {
         std::string vertexCode;
         std::string fragmentCode;
