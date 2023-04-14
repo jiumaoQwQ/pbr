@@ -18,6 +18,8 @@ int main()
         glClearColor(0, 0, 0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        shader.setMat4("View",camera.getViewMatrix());
+        shader.setMat4("Projection",camera.getProjectionMatrix());
         shader.setMat4("Model",sphere.getModelMatrix());
 
         sphere.draw();

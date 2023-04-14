@@ -3,6 +3,8 @@
 #include <glad/gl.h>
 #include <glfw/glfw3.h>
 
+#include "Camera.h"
+
 GLFWwindow *window;
 static struct __Init_glfw
 {
@@ -25,3 +27,5 @@ static struct __Init_glfw
         glfwTerminate();
     }
 } __init_glfw;
+
+static Camera camera;

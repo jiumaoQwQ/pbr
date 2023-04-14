@@ -1,63 +1,69 @@
 #pragma once
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
-#include <glm/mat4x4.hpp>
+
+#include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <GLFW/glfw3.h>
-
-#include <iostream>
+enum Direction
+{
+    FORWARD,
+    BACKWARD,
+    LEFT,
+    RIGHT
+};
 
 struct Camera
 {
-    const glm::vec3 baseFront{0, 0, -1};
+    glm::vec3 pos = {0, 0, 10};
+    glm::vec3 euler = {0, 0, 0};
+    float fov = 45.0f;
+    float aspect = 1.0f;
+    float zNear = 0.1f;
+    float zFar = 100.0f;
 
-    glm::vec3 pos{0, 0, 4};
-    glm::quat q{0, 0, 0, 1};
-    glm::vec3 front{0, 0, -1};
-    glm::vec3 right{};
-    glm::vec3 up{};
-    glm::vec3 eulerEngle{0, 0, 0};
-
-    float fov = 45.0;
-    float aspect = 1920 * 1.0 / 1080;
-
+    const glm::vec3 worldUp = {0, 1, 0};
+    const glm::vec4 direction = {0, 0, -1, 1};
     Camera()
     {
-        update();
     }
 
-    Camera(glm::vec3 _pos, float _aspect) : pos(_pos),
-                                            aspect(_aspect)
+    Camera(glm::vec3 const &_pos, glm::vec3 const &_euler) : pos(_pos), euler(_euler)
     {
-        update();
     }
-
     glm::mat4 getViewMatrix()
     {
-        return glm::lookAt(pos, pos + front, up);
+        glm::qua<float> quaternion = glm::qua<float>(glm::radians(euler));
+        glm::vec4 lookatdir = glm::mat4_cast(quaternion) * direction;
+        glm::vec3 lookatpos = pos + glm::vec3(lookatdir.x, lookatdir.y, lookatdir.z);
+        return glm::lookAt(pos, lookatpos, worldUp);
     }
-
     glm::mat4 getProjectionMatrix()
     {
-        return glm::perspective(glm::radians(fov), aspect, 0.1f, 100.0f);
+        return glm::perspective(fov, aspect, zNear, zFar);
     }
-
-    void onMouseMove(float deltaX, float deltaY)
+    void move(Direction dir)
     {
-        eulerEngle.y += glm::radians(deltaX * 0.05f);
-        eulerEngle.x += glm::radians(deltaY * 0.05f);
-
-        q = glm::quat(eulerEngle);
-        update();
-    }
-
-    void update()
-    {
-        front = glm::normalize(q * baseFront);
-        right = glm::normalize(glm::cross(front, glm::vec3(0, 1, 0)));
-        up = glm::normalize(glm::cross(right, front));
+        float speed = 0.01;
+        glm::qua<float> quaternion = glm::qua<float>(glm::radians(euler));
+        glm::vec4 _forwardDir = glm::mat4_cast(quaternion) * direction;
+        glm::vec3 forwardDir = glm::vec3(_forwardDir);
+        glm::vec3 rightDir = glm::cross(forwardDir, worldUp);
+        switch (dir)
+        {
+        case FORWARD:
+            pos += forwardDir * speed;
+            break;
+        case BACKWARD:
+            pos -= forwardDir * speed;
+            break;
+        case LEFT:
+            pos -= rightDir * speed;
+            break;
+        case RIGHT:
+            pos += rightDir * speed;
+            break;
+        default:
+            break;
+        }
     }
 };
