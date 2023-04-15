@@ -8,28 +8,27 @@
 #include <vector>
 #include <cmath>
 
-#define PI 3.14159
-
 class Sphere
 {
 private:
     float radius = 1.0f;
     glm::vec3 pos = {0, 0, 0};
-    glm::vec3 color = {1, 1, 1};
 
     SphereVao vao;
 
 public:
     explicit Sphere()
     {
-        int X_SEGMENTS = 60;
-        int Y_SEGMENTS = 60;
-        std::vector<float> sphereVertices, sphereNormal, sphereTexcoord;
-        std::vector<unsigned int> sphereIndices;
+        std::vector<glm::vec3> positions, normals;
+        std::vector<glm::vec2> uv;
+        std::vector<unsigned int> indices;
 
-        for (int y = 0; y <= Y_SEGMENTS; y++)
+        const unsigned int X_SEGMENTS = 64;
+        const unsigned int Y_SEGMENTS = 64;
+        const float PI = 3.14159265359f;
+        for (unsigned int x = 0; x <= X_SEGMENTS; ++x)
         {
-            for (int x = 0; x <= X_SEGMENTS; x++)
+            for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
             {
                 float xSegment = (float)x / (float)X_SEGMENTS;
                 float ySegment = (float)y / (float)Y_SEGMENTS;
@@ -37,35 +36,36 @@ public:
                 float yPos = std::cos(ySegment * PI);
                 float zPos = std::sin(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
 
-                sphereVertices.push_back(xPos);
-                sphereVertices.push_back(yPos);
-                sphereVertices.push_back(zPos);
-
-                sphereNormal.push_back(xPos);
-                sphereNormal.push_back(yPos);
-                sphereNormal.push_back(zPos);
-
-                sphereTexcoord.push_back(xSegment);
-                sphereTexcoord.push_back(ySegment);
+                positions.push_back(glm::vec3(xPos, yPos, zPos));
+                uv.push_back(glm::vec2(xSegment, ySegment));
+                normals.push_back(glm::vec3(xPos, yPos, zPos));
             }
         }
 
-        for (int i = 0; i < Y_SEGMENTS; i++)
+        bool oddRow = false;
+        for (unsigned int y = 0; y < Y_SEGMENTS; ++y)
         {
-            for (int j = 0; j < X_SEGMENTS; j++)
+            if (!oddRow)
             {
-                sphereIndices.push_back(i * (X_SEGMENTS + 1) + j);
-                sphereIndices.push_back((i + 1) * (X_SEGMENTS + 1) + j + 1);
-                sphereIndices.push_back((i + 1) * (X_SEGMENTS + 1) + j);
-
-                sphereIndices.push_back(i * (X_SEGMENTS + 1) + j);
-                sphereIndices.push_back(i * (X_SEGMENTS + 1) + j + 1);
-                sphereIndices.push_back((i + 1) * (X_SEGMENTS + 1) + j + 1);
+                for (unsigned int x = 0; x <= X_SEGMENTS; ++x)
+                {
+                    indices.push_back(y * (X_SEGMENTS + 1) + x);
+                    indices.push_back((y + 1) * (X_SEGMENTS + 1) + x);
+                }
             }
+            else
+            {
+                for (int x = X_SEGMENTS; x >= 0; --x)
+                {
+                    indices.push_back((y + 1) * (X_SEGMENTS + 1) + x);
+                    indices.push_back(y * (X_SEGMENTS + 1) + x);
+                }
+            }
+            oddRow = !oddRow;
         }
 
-        vao.copyIn(sphereVertices.data(), sphereNormal.data(), sphereTexcoord.data(), sphereIndices.data(),
-                   sphereVertices.size() * sizeof(float), sphereNormal.size() * sizeof(float), sphereTexcoord.size() * sizeof(float), sphereIndices.size() * sizeof(unsigned int));
+        vao.copyIn(positions.data(), normals.data(), uv.data(), indices.data(),
+                   positions.size() * sizeof(glm::vec3), normals.size() * sizeof(glm::vec3), uv.size() * sizeof(glm::vec2), indices.size() * sizeof(unsigned int));
     }
 
     void setPos(glm::vec3 const &_pos)

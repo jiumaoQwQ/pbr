@@ -44,7 +44,7 @@ struct SphereVao
     {
         glBindVertexArray(vao[0]);
 
-        glDrawElements(GL_TRIANGLES, num_of_index, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLE_STRIP, num_of_index, GL_UNSIGNED_INT, 0);
     }
 
     unsigned int vao[1], vbo[4];

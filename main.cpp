@@ -11,13 +11,11 @@ int main()
     shader.use();
 
     Sphere sphere;
-    Lights<1> lights;
     Light light;
-    light.pos = {0, 0, 10};
-    light.color = {150, 150, 150};
-    lights.add_light(light);
-    shader.setVec3("lightPositions[0]", lights.pos[0]);
-    shader.setVec3("lightColors[0]", lights.color[0]);
+    light.pos = {0, 0, 10.0f};
+    light.color = {150.0f, 150.0f, 150.0f};
+    shader.setVec3("lightPositions[0]", light.pos);
+    shader.setVec3("lightColors[0]", light.color);
 
     std::vector<Texture> textures(5);
     textures[0].loadTexture("./data/albedo.png");
@@ -26,6 +24,12 @@ int main()
     textures[3].loadTexture("./data/roughness.png");
     textures[4].loadTexture("./data/ao.png");
 
+    shader.setInt("albedoMap",0);
+    shader.setInt("normalMap",1);
+    shader.setInt("metallicMap",2);
+    shader.setInt("roughnessMap",3);
+    shader.setInt("apMap",4);
+    
     for (int i = 0; i < 5; i++)
     {
         textures[i].bind(i);

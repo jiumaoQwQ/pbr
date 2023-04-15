@@ -14,7 +14,7 @@ enum Direction
 
 struct Camera
 {
-    glm::vec3 pos = {0, 0, 5};
+    glm::vec3 pos = {0, 0, 3};
     glm::vec3 euler = {0, 0, 0};
     float fov = 45.0f;
     float aspect = 1.0f;
@@ -22,7 +22,7 @@ struct Camera
     float zFar = 100.0f;
 
     const glm::vec3 worldUp = {0, 1, 0};
-    const glm::vec4 direction = {0, 0, -1, 1};
+    const glm::vec3 direction = {0, 0, -1};
     Camera()
     {
     }
@@ -33,8 +33,8 @@ struct Camera
     glm::mat4 getViewMatrix()
     {
         glm::qua<float> quaternion = glm::qua<float>(glm::radians(euler));
-        glm::vec4 lookatdir = glm::mat4_cast(quaternion) * direction;
-        glm::vec3 lookatpos = pos + glm::vec3(lookatdir.x, lookatdir.y, lookatdir.z);
+        glm::vec3 lookatdir = glm::mat3_cast(quaternion) * direction;
+        glm::vec3 lookatpos = pos + lookatdir;
         return glm::lookAt(pos, lookatpos, worldUp);
     }
     glm::mat4 getProjectionMatrix()
@@ -45,7 +45,7 @@ struct Camera
     {
         float speed = 0.01;
         glm::qua<float> quaternion = glm::qua<float>(glm::radians(euler));
-        glm::vec4 _forwardDir = glm::mat4_cast(quaternion) * direction;
+        glm::vec3 _forwardDir = glm::mat3_cast(quaternion) * direction;
         glm::vec3 forwardDir = glm::vec3(_forwardDir);
         glm::vec3 rightDir = glm::cross(forwardDir, worldUp);
         switch (dir)
