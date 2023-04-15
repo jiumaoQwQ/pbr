@@ -14,7 +14,7 @@ enum Direction
 
 struct Camera
 {
-    glm::vec3 pos = {0, 0, 10};
+    glm::vec3 pos = {0, 0, 5};
     glm::vec3 euler = {0, 0, 0};
     float fov = 45.0f;
     float aspect = 1.0f;

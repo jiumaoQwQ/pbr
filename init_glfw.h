@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glad/gl.h>
+#include <glad/glad.h>
 #include <glfw/glfw3.h>
 
 #include "Camera.h"
@@ -11,16 +11,19 @@ static struct __Init_glfw
     __Init_glfw()
     {
         glfwInit();
-
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_SAMPLES, 4);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-        window = glfwCreateWindow(800, 800, "ThreeBody", NULL, NULL);
+        window = glfwCreateWindow(800, 800, "PBR", NULL, NULL);
         glfwMakeContextCurrent(window);
         glfwSetFramebufferSizeCallback(window, [](GLFWwindow *window, int width, int height)
                                        { glViewport(0, 0, width, height); });
-        gladLoadGL(glfwGetProcAddress);
+        gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+
+        glEnable(GL_CULL_FACE);
+        glEnable(GL_DEPTH_TEST);
     }
     ~__Init_glfw()
     {
